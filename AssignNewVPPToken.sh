@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# This script should be run after the 'Uncheck' script, and will recheck the 'Managed Distribution' tab
 #############################################################################################
 #
 # Copyright (c) 2020, JAMF Software, LLC. All rights reserved.
@@ -15,6 +15,9 @@
 # Ginger Zosel
 # March 2021
 
+echo "This script is designed to run after UncheckManagedDistribution.sh script"
+echo "and transferring the licenses to the new token"
+echo "this script will re-check the 'Managed Distribution' box and assign to the designated VPP token"
 
 # Enter in the URL of the JSS . 
 echo " "
@@ -58,7 +61,7 @@ echo "Retrieving List of iOS Apps to update"
 ids=$(curl -H "authorization: Basic $auth" -H "Content-type: text/xml" -ks "$JSSURL/JSSResource/mobiledeviceapplications" | xmllint --format - | awk -F '[<>]' '/<id>/{print $3}')
 }
 
-# Unselect 'managed distribution' for all iOS apps, based on GetiOSAppIDs function
+# Select 'managed distribution' for all iOS apps and assign to new VPP token, based on GetiOSAppIDs function
 UpdateForiOS () {
 for id in $ids; do
 echo "updating iOS ID $id..."
@@ -78,7 +81,7 @@ echo "..."
 ids=$(curl -H "authorization: Basic $auth" -H "Content-type: text/xml" -ks "$JSSURL/JSSResource/macapplications" | xmllint --format - | awk -F '[<>]' '/<id>/{print $3}')
 }
 
-# Uncheck Managed Distribution box for all MacOS Apps
+# Check Managed Distribution box for all MacOS Apps and assign to new VPP token
 UpdateForMacOS () {
 for id in $ids; do
 echo "updating Mac App ID $id..."
@@ -100,7 +103,7 @@ echo ""
 tokenname=$(curl -H "authorization: Basic $auth" -H "Content-type: text/xml" -ks "$JSSURL/JSSResource/vppaccounts/id/$token" | xmllint -xpath /vpp_account/name - | sed -e 's/<[^>]*>//g')
 echo $tokenname
 
-# Ask if we want to disassociate all iOS licenses
+# Ask if we want to assign all iOS apps to the new token
 while true; do
 	read -p "Would you like to assign all iOS apps to use the \"$tokenname\" VPP token? (y/n) " yn
 	case $yn in
@@ -115,7 +118,7 @@ while true; do
 	esac
 done
 
-# Ask if we want to disassociate all MacOS licenses
+# Ask if we want to assign all MacOS apps to the new token
 while true; do
 	read -p "Would you like to assign all MacOS apps to use the $tokenname VPP token? (y/n) " yn
 	case $yn in
@@ -144,10 +147,10 @@ echo ""
 echo ""
 echo ""
 echo ""
-echo "All selected Apps should now have the 'Assign Volume Content' box unchecked in the Managed Distribution tab"
+echo "All selected Apps should now have the 'Assign Volume Content' box checked in the Managed Distribution tab"
+echo "We should also see all apps assigned to the new VPP token"
 echo " "
-echo "The 'In Use' count for each App listing should be decreasing"
-echo "To view the In Use count, go to Settings > Volume Purchasing > your legacy VPP portal token"
-echo "Under the Content tab, we will want to wait until all In-Use reads 0 for Mobile Device Apps"
+echo "The 'In Use' count for each App listing should be increasing"
+echo "There should also be licensing information listed on the Devices > Apps page for each app"
 echo "If this does not happen, go to Mobile Devices > Mobile Device Apps, and sort by 'Total Purchased'"
-echo "Manually uncheck the 'Assign Volume Content' box of every app that still has a license count"
+echo "Manually check 'Assign Volume Content' box of every app that is not showing license informatoin, and assign to the new token"
