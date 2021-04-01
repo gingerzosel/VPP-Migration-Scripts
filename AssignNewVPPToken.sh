@@ -101,7 +101,8 @@ echo ""
 ########
 
 tokenname=$(curl -H "authorization: Basic $auth" -H "Content-type: text/xml" -ks "$JSSURL/JSSResource/vppaccounts/id/$token" | xmllint -xpath /vpp_account/name - | sed -e 's/<[^>]*>//g')
-echo $tokenname
+echo ""
+echo "The selected token is $tokenname"
 
 # Ask if we want to assign all iOS apps to the new token
 while true; do
@@ -153,4 +154,4 @@ echo " "
 echo "The 'In Use' count for each App listing should be increasing"
 echo "There should also be licensing information listed on the Devices > Apps page for each app"
 echo "If this does not happen, go to Mobile Devices > Mobile Device Apps, and sort by 'Total Purchased'"
-echo "Manually check 'Assign Volume Content' box of every app that is not showing license informatoin, and assign to the new token"
+echo "Manually check 'Assign Volume Content' box of every app that is not displaying license information, and assign to the new token"
